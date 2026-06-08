@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import type { AppDb } from "./index";
 import {
   assignments,
@@ -49,12 +49,29 @@ export async function getMostRecentYear(db: AppDb) {
   return year ?? null;
 }
 
+export async function listHighHolidayYears(db: AppDb) {
+  return db
+    .select()
+    .from(highHolidayYears)
+    .orderBy(desc(highHolidayYears.jewishYear));
+}
+
 export async function getActiveYear(db: AppDb) {
   const [year] = await db
     .select()
     .from(highHolidayYears)
     .where(eq(highHolidayYears.isActive, true))
     .orderBy(desc(highHolidayYears.jewishYear))
+    .limit(1);
+
+  return year ?? null;
+}
+
+export async function getHighHolidayYearById(db: AppDb, id: number) {
+  const [year] = await db
+    .select()
+    .from(highHolidayYears)
+    .where(eq(highHolidayYears.id, id))
     .limit(1);
 
   return year ?? null;
@@ -80,6 +97,14 @@ export async function upsertHighHolidayYear(
   return year;
 }
 
+export async function listServicesForYear(db: AppDb, yearId: number) {
+  return db
+    .select()
+    .from(services)
+    .where(eq(services.yearId, yearId))
+    .orderBy(asc(services.sortOrder), asc(services.serviceDate), asc(services.name));
+}
+
 export async function upsertService(db: AppDb, values: NewService) {
   const [service] = await db
     .insert(services)
@@ -95,6 +120,32 @@ export async function upsertService(db: AppDb, values: NewService) {
     .returning();
 
   return service;
+}
+
+export async function listHonorsForYear(db: AppDb, yearId: number) {
+  return db
+    .select({
+      id: honors.id,
+      yearId: honors.yearId,
+      serviceId: honors.serviceId,
+      honorType: honors.honorType,
+      prayerName: honors.prayerName,
+      pageNumber: honors.pageNumber,
+      estimatedHonorTime: honors.estimatedHonorTime,
+      sortOrder: honors.sortOrder,
+      serviceName: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+    })
+    .from(honors)
+    .innerJoin(services, eq(honors.serviceId, services.id))
+    .where(eq(honors.yearId, yearId))
+    .orderBy(
+      asc(services.sortOrder),
+      asc(services.serviceDate),
+      asc(honors.sortOrder),
+      asc(honors.honorType)
+    );
 }
 
 export async function upsertHonor(db: AppDb, values: NewHonor) {

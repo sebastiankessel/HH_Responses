@@ -332,7 +332,7 @@ Example subject:
 
 1. DONE - Scaffold the Sites app and configure D1.
 2. DONE - Build schema, migrations, and database helper functions.
-3. Build branded layout and admin password gate.
+3. DONE - Build branded layout and admin password gate.
 4. Build year, service, and honor setup screens.
 5. Build CSV upload, parsing, validation, and import preview.
 6. Build assignment import and deduplication.

@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Starter Project",
-  description: "A clean starting point for building your site.",
+  title: "High Holiday Honors | Congregation Ner Tamid",
+  description:
+    "High Holiday honors RSVP coordination for Congregation Ner Tamid of South Bay.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

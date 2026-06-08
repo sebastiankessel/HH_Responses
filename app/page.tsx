@@ -1,64 +1,78 @@
-// Internal workspace sites can read the authenticated OpenAI user from the
-// forwarded request headers:
-//
-// import { headers } from "next/headers";
-//
-// export default async function Home() {
-//   const requestHeaders = await headers();
-//   const email = requestHeaders.get("oai-authenticated-user-email");
-//   const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-//   const fullName =
-//     encodedFullName &&
-//     requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-//       "percent-encoded-utf-8"
-//       ? decodeURIComponent(encodedFullName)
-//       : null;
-//   const displayName = fullName ?? email;
-//   // ...
-// }
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-24 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
-      <div className="mx-auto flex max-w-4xl flex-col gap-16">
-        <section className="space-y-6">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-            Starter Project
-          </p>
-          <h1 className="max-w-2xl text-5xl font-semibold tracking-tight sm:text-6xl">
-            Ship something real from a clean baseline.
-          </h1>
-          <p className="max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
-            This starter keeps the shell minimal so you can focus on the
-            product, content, and workflows that matter for your build.
-          </p>
-        </section>
+    <main className="min-h-screen bg-[#f8f3ea] text-[#231f20]">
+      <section className="mx-auto flex min-h-screen max-w-6xl flex-col justify-between px-5 py-8">
+        <nav className="flex items-center justify-between gap-4">
+          <Link
+            className="text-sm font-semibold uppercase tracking-[0.18em] text-[#1d3c34]"
+            href="/"
+          >
+            Congregation Ner Tamid
+          </Link>
+          <Link
+            className="rounded-md border border-[#b99b6d] px-4 py-2 text-sm font-semibold text-[#6b4a22] transition hover:bg-[#f2e5d0]"
+            href="/admin"
+          >
+            Admin
+          </Link>
+        </nav>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <article className="rounded-3xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-lg font-semibold">Start with structure</h2>
-            <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-300">
-              Replace this page with your site entry point and shape the layout
-              around the experience you actually need.
+        <div className="grid items-center gap-10 py-16 md:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-7">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#8b5f2f]">
+              Jewish Spirit - Modern Experience
             </p>
-          </article>
-          <article className="rounded-3xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-lg font-semibold">Keep the stack quiet</h2>
-            <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-300">
-              The default copy stays framework-agnostic so the interface reads
-              like your product, not a generated template.
+            <div className="space-y-5">
+              <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-[#1d3c34] sm:text-6xl">
+                High Holiday honors RSVP coordination.
+              </h1>
+              <p className="max-w-2xl text-lg leading-8 text-[#5f5750]">
+                A gracious response site for Congregation Ner Tamid of South
+                Bay members invited to participate in High Holiday services.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                className="rounded-md bg-[#1d6f61] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#185b50]"
+                href="/admin"
+              >
+                Open admin
+              </Link>
+              <span className="rounded-md border border-[#dfd1bd] px-5 py-3 text-center text-sm font-semibold text-[#6d635b]">
+                RSVP links are sent by email
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-[#dfd1bd] bg-[#fffaf2] p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b5f2f]">
+              South Bay / Rancho Palos Verdes
             </p>
-          </article>
-          <article className="rounded-3xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-lg font-semibold">Drizzle-ready</h2>
-            <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-300">
-              D1 bindings live in <code>.openai/hosting.json</code>, schema
-              lives in <code>db/schema.ts</code>, and an inactive D1 route
-              example lives at <code>examples/d1/app/api/notes/route.ts</code>.
+            <h2 className="mt-4 text-2xl font-semibold text-[#1d3c34]">
+              Honors invitations
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-[#625950]">
+              Members receive a unique link for each assigned honor. The public
+              RSVP page will show the honor, service date, and response options
+              once invitation workflows are implemented.
             </p>
-          </article>
-        </section>
-      </div>
+            <div className="mt-6 border-t border-[#eadcca] pt-5">
+              <p className="text-sm font-semibold text-[#3c352f]">
+                Office workspace
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#625950]">
+                Admin screens are protected by a server-side password gate.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <footer className="border-t border-[#dfd1bd] pt-5 text-sm text-[#6d635b]">
+          Congregation Ner Tamid of South Bay
+        </footer>
+      </section>
     </main>
   );
 }

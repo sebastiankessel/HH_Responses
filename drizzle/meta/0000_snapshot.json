@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "db5c1694-8f3b-47b4-b644-61511bc71742",
+  "id": "c722fdac-6c75-4781-8d3e-09435c4b9660",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "assignments": {
@@ -354,15 +354,17 @@
           "name": "prayer_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         },
         "page_number": {
           "name": "page_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         },
         "estimated_honor_time": {
           "name": "estimated_honor_time",

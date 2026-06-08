@@ -27,6 +27,10 @@ export function normalizeEmail(value: string | null | undefined) {
   return normalizeOptionalText(value)?.toLowerCase() ?? null;
 }
 
+export function normalizeHonorKeyText(value: string | null | undefined) {
+  return value?.trim() ?? "";
+}
+
 export function createRsvpToken(byteLength = 32) {
   const bytes = new Uint8Array(byteLength);
   crypto.getRandomValues(bytes);
@@ -94,9 +98,15 @@ export async function upsertService(db: AppDb, values: NewService) {
 }
 
 export async function upsertHonor(db: AppDb, values: NewHonor) {
+  const insertValues = {
+    ...values,
+    prayerName: normalizeHonorKeyText(values.prayerName),
+    pageNumber: normalizeHonorKeyText(values.pageNumber),
+  };
+
   const [honor] = await db
     .insert(honors)
-    .values(values)
+    .values(insertValues)
     .onConflictDoUpdate({
       target: [
         honors.yearId,
@@ -106,8 +116,8 @@ export async function upsertHonor(db: AppDb, values: NewHonor) {
         honors.pageNumber,
       ],
       set: {
-        estimatedHonorTime: values.estimatedHonorTime ?? null,
-        sortOrder: values.sortOrder ?? 0,
+        estimatedHonorTime: insertValues.estimatedHonorTime ?? null,
+        sortOrder: insertValues.sortOrder ?? 0,
       },
     })
     .returning();

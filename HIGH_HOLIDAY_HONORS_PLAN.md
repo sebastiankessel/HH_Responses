@@ -333,9 +333,9 @@ Example subject:
 1. DONE - Scaffold the Sites app and configure D1.
 2. DONE - Build schema, migrations, and database helper functions.
 3. DONE - Build branded layout and admin password gate.
-4. Build year, service, and honor setup screens.
+4. DONE - Build year, service, and honor setup screens.
 5. Build CSV upload, parsing, validation, and import preview.
-6. Build assignment import and deduplication.
+6. DONE - Build assignment import and deduplication.
 7. Build member RSVP token pages and response persistence.
 8. Add transactional email integration and send tracking.
 9. Add manual admin create/edit flows for all setup data and assignments.

@@ -3,7 +3,7 @@ import { env } from "cloudflare:workers";
 export const ADMIN_SESSION_COOKIE = "hh_admin_session";
 const SESSION_PAYLOAD = "high-holiday-honors-admin";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
-const FALLBACK_ADMIN_PASSWORD = "change-this-high-holiday-password";
+const FALLBACK_ADMIN_PASSWORD = "CNT2026";
 
 type RuntimeEnv = typeof env & {
   ADMIN_PASSWORD?: string;

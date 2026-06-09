@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import type { AppDb } from "./index";
 import {
   assignments,
@@ -72,6 +72,19 @@ export async function getHighHolidayYearById(db: AppDb, id: number) {
     .select()
     .from(highHolidayYears)
     .where(eq(highHolidayYears.id, id))
+    .limit(1);
+
+  return year ?? null;
+}
+
+export async function getHighHolidayYearByJewishYear(
+  db: AppDb,
+  jewishYear: number
+) {
+  const [year] = await db
+    .select()
+    .from(highHolidayYears)
+    .where(eq(highHolidayYears.jewishYear, jewishYear))
     .limit(1);
 
   return year ?? null;
@@ -178,6 +191,7 @@ export async function upsertHonor(db: AppDb, values: NewHonor) {
 
 export async function upsertMember(db: AppDb, values: NewMember) {
   const email = normalizeEmail(values.email);
+  const phone = normalizeOptionalText(values.phone);
   const externalMemberId = normalizeOptionalText(values.externalMemberId);
 
   if (externalMemberId) {
@@ -189,7 +203,7 @@ export async function upsertMember(db: AppDb, values: NewMember) {
         set: {
           name: values.name,
           email,
-          phone: normalizeOptionalText(values.phone),
+          phone,
           updatedAt: new Date().toISOString(),
         },
       })
@@ -210,7 +224,7 @@ export async function upsertMember(db: AppDb, values: NewMember) {
         .update(members)
         .set({
           name: values.name,
-          phone: normalizeOptionalText(values.phone),
+          phone,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(members.id, existing.id))
@@ -220,12 +234,44 @@ export async function upsertMember(db: AppDb, values: NewMember) {
     }
   }
 
+  const noEmailConditions = [
+    eq(members.name, values.name),
+    isNull(members.email),
+    isNull(members.externalMemberId),
+  ];
+
+  if (phone) {
+    noEmailConditions.push(eq(members.phone, phone));
+  } else {
+    noEmailConditions.push(isNull(members.phone));
+  }
+
+  const [existingWithoutEmail] = await db
+    .select()
+    .from(members)
+    .where(and(...noEmailConditions))
+    .limit(1);
+
+  if (existingWithoutEmail) {
+    const [member] = await db
+      .update(members)
+      .set({
+        name: values.name,
+        phone,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(members.id, existingWithoutEmail.id))
+      .returning();
+
+    return member;
+  }
+
   const [member] = await db
     .insert(members)
     .values({
       ...values,
       email,
-      phone: normalizeOptionalText(values.phone),
+      phone,
       externalMemberId: null,
     })
     .returning();
@@ -233,7 +279,7 @@ export async function upsertMember(db: AppDb, values: NewMember) {
   return member;
 }
 
-export async function createAssignment(
+export async function upsertAssignment(
   db: AppDb,
   values: Omit<NewAssignment, "rsvpToken">
 ) {
@@ -246,7 +292,7 @@ export async function createAssignment(
     .returning();
 
   if (assignment) {
-    return assignment;
+    return { assignment, created: true };
   }
 
   const [existing] = await db
@@ -261,7 +307,49 @@ export async function createAssignment(
     )
     .limit(1);
 
-  return existing ?? null;
+  return existing ? { assignment: existing, created: false } : null;
+}
+
+export async function createAssignment(
+  db: AppDb,
+  values: Omit<NewAssignment, "rsvpToken">
+) {
+  const result = await upsertAssignment(db, values);
+  return result?.assignment ?? null;
+}
+
+export async function listAssignmentsForYear(db: AppDb, yearId: number) {
+  return db
+    .select({
+      id: assignments.id,
+      yearId: assignments.yearId,
+      honorId: assignments.honorId,
+      memberId: assignments.memberId,
+      emailStatus: assignments.emailStatus,
+      responseStatus: assignments.responseStatus,
+      createdAt: assignments.createdAt,
+      memberName: members.name,
+      memberEmail: members.email,
+      memberPhone: members.phone,
+      externalMemberId: members.externalMemberId,
+      serviceName: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+      honorType: honors.honorType,
+      prayerName: honors.prayerName,
+      pageNumber: honors.pageNumber,
+    })
+    .from(assignments)
+    .innerJoin(members, eq(assignments.memberId, members.id))
+    .innerJoin(honors, eq(assignments.honorId, honors.id))
+    .innerJoin(services, eq(honors.serviceId, services.id))
+    .where(eq(assignments.yearId, yearId))
+    .orderBy(
+      asc(services.sortOrder),
+      asc(services.serviceDate),
+      asc(honors.sortOrder),
+      asc(members.name)
+    );
 }
 
 export async function findAssignmentByToken(db: AppDb, token: string) {

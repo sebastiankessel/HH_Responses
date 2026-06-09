@@ -1,13 +1,17 @@
+import Link from "next/link";
+
 const adminSections = [
   {
     title: "Year and setup",
     description: "Configure the Jewish year, services, and honors.",
-    status: "Next phase",
+    status: "Ready",
+    href: "/admin/setup",
   },
   {
     title: "Assignment imports",
     description: "Upload assigned members and preview corrections.",
-    status: "Planned",
+    status: "Ready",
+    href: "/admin/assignments",
   },
   {
     title: "Email invitations",
@@ -41,6 +45,14 @@ export default function AdminPage() {
             <p className="mt-4 text-sm leading-6 text-[#625950]">
               {section.description}
             </p>
+            {section.href ? (
+              <Link
+                className="mt-5 inline-flex rounded-md bg-[#1d6f61] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#185b50]"
+                href={section.href}
+              >
+                Open {section.title.toLowerCase()}
+              </Link>
+            ) : null}
           </article>
         ))}
       </div>

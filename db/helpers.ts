@@ -115,7 +115,7 @@ export async function listServicesForYear(db: AppDb, yearId: number) {
     .select()
     .from(services)
     .where(eq(services.yearId, yearId))
-    .orderBy(asc(services.sortOrder), asc(services.serviceDate), asc(services.name));
+    .orderBy(asc(services.serviceDate), asc(services.serviceTime), asc(services.name));
 }
 
 export async function upsertService(db: AppDb, values: NewService) {
@@ -145,7 +145,6 @@ export async function listHonorsForYear(db: AppDb, yearId: number) {
       prayerName: honors.prayerName,
       pageNumber: honors.pageNumber,
       estimatedHonorTime: honors.estimatedHonorTime,
-      sortOrder: honors.sortOrder,
       serviceName: services.name,
       serviceDate: services.serviceDate,
       serviceTime: services.serviceTime,
@@ -154,9 +153,8 @@ export async function listHonorsForYear(db: AppDb, yearId: number) {
     .innerJoin(services, eq(honors.serviceId, services.id))
     .where(eq(honors.yearId, yearId))
     .orderBy(
-      asc(services.sortOrder),
       asc(services.serviceDate),
-      asc(honors.sortOrder),
+      asc(services.serviceTime),
       asc(honors.honorType)
     );
 }
@@ -181,7 +179,6 @@ export async function upsertHonor(db: AppDb, values: NewHonor) {
       ],
       set: {
         estimatedHonorTime: insertValues.estimatedHonorTime ?? null,
-        sortOrder: insertValues.sortOrder ?? 0,
       },
     })
     .returning();
@@ -347,7 +344,7 @@ export async function listAssignmentsForYear(db: AppDb, yearId: number) {
     .orderBy(
       asc(services.sortOrder),
       asc(services.serviceDate),
-      asc(honors.sortOrder),
+      asc(honors.honorType),
       asc(members.name)
     );
 }
@@ -360,6 +357,75 @@ export async function findAssignmentByToken(db: AppDb, token: string) {
     .limit(1);
 
   return assignment ?? null;
+}
+
+export async function getRsvpAssignmentByToken(db: AppDb, token: string) {
+  const [assignment] = await db
+    .select({
+      id: assignments.id,
+      yearId: assignments.yearId,
+      honorId: assignments.honorId,
+      memberId: assignments.memberId,
+      rsvpToken: assignments.rsvpToken,
+      responseStatus: assignments.responseStatus,
+      yearLabel: highHolidayYears.label,
+      jewishYear: highHolidayYears.jewishYear,
+      memberName: members.name,
+      serviceId: services.id,
+      serviceName: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+      honorType: honors.honorType,
+      prayerName: honors.prayerName,
+      pageNumber: honors.pageNumber,
+      estimatedHonorTime: honors.estimatedHonorTime,
+    })
+    .from(assignments)
+    .innerJoin(highHolidayYears, eq(assignments.yearId, highHolidayYears.id))
+    .innerJoin(members, eq(assignments.memberId, members.id))
+    .innerJoin(honors, eq(assignments.honorId, honors.id))
+    .innerJoin(services, eq(honors.serviceId, services.id))
+    .where(eq(assignments.rsvpToken, token))
+    .limit(1);
+
+  return assignment ?? null;
+}
+
+export async function getRsvpResponseForAssignment(
+  db: AppDb,
+  assignmentId: number
+) {
+  const [response] = await db
+    .select()
+    .from(rsvpResponses)
+    .where(eq(rsvpResponses.assignmentId, assignmentId))
+    .limit(1);
+
+  if (!response) {
+    return null;
+  }
+
+  const attendedServices = await db
+    .select({
+      id: services.id,
+      name: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+    })
+    .from(rsvpResponseServices)
+    .innerJoin(services, eq(rsvpResponseServices.serviceId, services.id))
+    .where(eq(rsvpResponseServices.responseId, response.id))
+    .orderBy(
+      asc(services.serviceDate),
+      asc(services.serviceTime),
+      asc(services.name)
+    );
+
+  return { ...response, attendedServices };
+}
+
+export async function listRsvpServiceOptionsForYear(db: AppDb, yearId: number) {
+  return listServicesForYear(db, yearId);
 }
 
 export async function recordEmailEvent(db: AppDb, values: NewEmailEvent) {

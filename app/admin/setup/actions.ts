@@ -41,18 +41,20 @@ function numberField(formData: FormData, name: string) {
   return value;
 }
 
-function optionalNumberField(formData: FormData, name: string) {
-  const value = formData.get(name);
-  if (typeof value !== "string" || !value.trim()) {
-    return 0;
+function setupTab(formData: FormData, fallback: "years" | "services" | "honors") {
+  const value = formData.get("tab");
+  return value === "years" || value === "services" || value === "honors"
+    ? value
+    : fallback;
+}
+
+function setupRedirect(tab: "years" | "services" | "honors", yearId?: number) {
+  const params = new URLSearchParams({ tab });
+  if (tab !== "years" && yearId) {
+    params.set("yearId", String(yearId));
   }
 
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed)) {
-    throw new Error(`${name} must be a whole number.`);
-  }
-
-  return parsed;
+  redirect(`/admin/setup?${params.toString()}`);
 }
 
 async function clearActiveYearsIfNeeded(db: ReturnType<typeof getDb>, isActive: boolean) {
@@ -79,7 +81,7 @@ export async function createYear(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${year.id}`);
+  setupRedirect(setupTab(formData, "years"), year.id);
 }
 
 export async function updateYear(formData: FormData) {
@@ -100,7 +102,7 @@ export async function updateYear(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${id}`);
+  setupRedirect(setupTab(formData, "years"), id);
 }
 
 export async function deleteYear(formData: FormData) {
@@ -111,7 +113,7 @@ export async function deleteYear(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/setup");
-  redirect("/admin/setup");
+  setupRedirect("years");
 }
 
 export async function createService(formData: FormData) {
@@ -123,11 +125,11 @@ export async function createService(formData: FormData) {
     name: requiredText(formData, "name"),
     serviceDate: requiredText(formData, "serviceDate"),
     serviceTime: optionalText(formData, "serviceTime"),
-    sortOrder: optionalNumberField(formData, "sortOrder"),
+    sortOrder: 0,
   });
 
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${yearId}`);
+  setupRedirect("services", yearId);
 }
 
 export async function updateService(formData: FormData) {
@@ -141,12 +143,12 @@ export async function updateService(formData: FormData) {
       name: requiredText(formData, "name"),
       serviceDate: requiredText(formData, "serviceDate"),
       serviceTime: optionalText(formData, "serviceTime"),
-      sortOrder: optionalNumberField(formData, "sortOrder"),
+      sortOrder: 0,
     })
     .where(and(eq(services.id, id), eq(services.yearId, yearId)));
 
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${yearId}`);
+  setupRedirect("services", yearId);
 }
 
 export async function deleteService(formData: FormData) {
@@ -158,7 +160,7 @@ export async function deleteService(formData: FormData) {
     .where(and(eq(services.id, numberField(formData, "id")), eq(services.yearId, yearId)));
 
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${yearId}`);
+  setupRedirect("services", yearId);
 }
 
 export async function createHonor(formData: FormData) {
@@ -172,11 +174,10 @@ export async function createHonor(formData: FormData) {
     prayerName: optionalKeyText(formData, "prayerName"),
     pageNumber: optionalKeyText(formData, "pageNumber"),
     estimatedHonorTime: optionalText(formData, "estimatedHonorTime"),
-    sortOrder: optionalNumberField(formData, "sortOrder"),
   });
 
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${yearId}`);
+  setupRedirect("honors", yearId);
 }
 
 export async function updateHonor(formData: FormData) {
@@ -192,12 +193,11 @@ export async function updateHonor(formData: FormData) {
       prayerName: optionalKeyText(formData, "prayerName"),
       pageNumber: optionalKeyText(formData, "pageNumber"),
       estimatedHonorTime: optionalText(formData, "estimatedHonorTime"),
-      sortOrder: optionalNumberField(formData, "sortOrder"),
     })
     .where(and(eq(honors.id, id), eq(honors.yearId, yearId)));
 
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${yearId}`);
+  setupRedirect("honors", yearId);
 }
 
 export async function deleteHonor(formData: FormData) {
@@ -209,5 +209,5 @@ export async function deleteHonor(formData: FormData) {
     .where(and(eq(honors.id, numberField(formData, "id")), eq(honors.yearId, yearId)));
 
   revalidatePath("/admin/setup");
-  redirect(`/admin/setup?yearId=${yearId}`);
+  setupRedirect("honors", yearId);
 }

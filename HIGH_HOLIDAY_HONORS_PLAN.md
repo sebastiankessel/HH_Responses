@@ -265,9 +265,12 @@ Then show a confirmation page.
 
 ### Invalid or Completed Links
 
-If a token is invalid, show a polite message with synagogue contact guidance.
+If a token is invalid, show a polite message directing the member to contact
+Sebastian Kessel at `ritualvp@nertamid.com`.
 
-If an RSVP was already submitted, show the current response and offer admin contact guidance. Submitted RSVP responses cannot be edited by members.
+If an RSVP was already submitted, show the current response and direct the member
+to contact Sebastian Kessel at `ritualvp@nertamid.com` if something changes.
+Submitted RSVP responses cannot be edited by members.
 
 ## CSV Format
 
@@ -334,9 +337,9 @@ Example subject:
 2. DONE - Build schema, migrations, and database helper functions.
 3. DONE - Build branded layout and admin password gate.
 4. DONE - Build year, service, and honor setup screens.
-5. Build CSV upload, parsing, validation, and import preview.
+5. DONE - Build CSV upload, parsing, validation, and import preview.
 6. DONE - Build assignment import and deduplication.
-7. Build member RSVP token pages and response persistence.
+7. DONE - Build member RSVP token pages and response persistence.
 8. Add transactional email integration and send tracking.
 9. Add manual admin create/edit flows for all setup data and assignments.
 10. Build admin response dashboard and CSV exports.

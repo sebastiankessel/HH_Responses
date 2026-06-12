@@ -345,7 +345,7 @@ Example subject:
 10. DONE - Build admin response dashboard and CSV exports.
 11. DONE - Polish visual design, mobile responsiveness, and empty/error states.
 12. DONE - Run local build validation.
-13. Deploy with Sites when ready.
+13. DONE - Deploy with Sites when ready.
 
 ## Open Decisions
 

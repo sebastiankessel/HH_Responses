@@ -24,7 +24,8 @@ const adminSections = [
   {
     title: "Response review",
     description: "Track pending, accepted, and declined honors.",
-    status: "Planned",
+    status: "Ready",
+    href: "/admin/responses",
   },
 ];
 

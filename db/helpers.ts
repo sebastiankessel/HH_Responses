@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import type { AppDb } from "./index";
 import {
   assignments,
@@ -349,6 +349,101 @@ export async function listAssignmentsForYear(db: AppDb, yearId: number) {
       asc(honors.honorType),
       asc(members.name)
     );
+}
+
+export async function listResponseReviewForYear(db: AppDb, yearId: number) {
+  const rows = await db
+    .select({
+      id: assignments.id,
+      yearId: assignments.yearId,
+      honorId: assignments.honorId,
+      memberId: assignments.memberId,
+      rsvpToken: assignments.rsvpToken,
+      emailStatus: assignments.emailStatus,
+      emailSentAt: assignments.emailSentAt,
+      responseStatus: assignments.responseStatus,
+      createdAt: assignments.createdAt,
+      memberName: members.name,
+      memberEmail: members.email,
+      memberPhone: members.phone,
+      externalMemberId: members.externalMemberId,
+      serviceId: services.id,
+      serviceName: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+      honorType: honors.honorType,
+      prayerName: honors.prayerName,
+      pageNumber: honors.pageNumber,
+      estimatedHonorTime: honors.estimatedHonorTime,
+      responseId: rsvpResponses.id,
+      wantsReschedule: rsvpResponses.wantsReschedule,
+      notes: rsvpResponses.notes,
+      submittedAt: rsvpResponses.submittedAt,
+    })
+    .from(assignments)
+    .innerJoin(members, eq(assignments.memberId, members.id))
+    .innerJoin(honors, eq(assignments.honorId, honors.id))
+    .innerJoin(services, eq(honors.serviceId, services.id))
+    .leftJoin(rsvpResponses, eq(rsvpResponses.assignmentId, assignments.id))
+    .where(eq(assignments.yearId, yearId))
+    .orderBy(
+      asc(services.sortOrder),
+      asc(services.serviceDate),
+      asc(services.serviceTime),
+      asc(honors.sortOrder),
+      asc(honors.honorType),
+      asc(members.name)
+    );
+
+  const responseIds = rows
+    .map((row) => row.responseId)
+    .filter((id): id is number => typeof id === "number");
+
+  if (responseIds.length === 0) {
+    return rows.map((row) => ({ ...row, attendedServices: [] }));
+  }
+
+  const attendedRows = await db
+    .select({
+      responseId: rsvpResponseServices.responseId,
+      serviceName: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+    })
+    .from(rsvpResponseServices)
+    .innerJoin(services, eq(rsvpResponseServices.serviceId, services.id))
+    .where(inArray(rsvpResponseServices.responseId, responseIds))
+    .orderBy(
+      asc(services.serviceDate),
+      asc(services.serviceTime),
+      asc(services.name)
+    );
+
+  const attendedByResponse = new Map<
+    number,
+    Array<{
+      serviceName: string;
+      serviceDate: string;
+      serviceTime: string | null;
+    }>
+  >();
+
+  for (const attended of attendedRows) {
+    const list = attendedByResponse.get(attended.responseId) ?? [];
+    list.push({
+      serviceName: attended.serviceName,
+      serviceDate: attended.serviceDate,
+      serviceTime: attended.serviceTime,
+    });
+    attendedByResponse.set(attended.responseId, list);
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    attendedServices: row.responseId
+      ? attendedByResponse.get(row.responseId) ?? []
+      : [],
+  }));
 }
 
 export async function getInvitationAssignmentById(

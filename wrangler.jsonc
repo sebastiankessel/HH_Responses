@@ -1,0 +1,17 @@
+{
+    "name": "hh-responses",
+    "main": "./worker/index.ts",
+    "compatibility_date": "2026-06-12",
+    "compatibility_flags": ["nodejs_compat"],
+    "assets": {
+        "directory": "./dist/client",
+        "binding": "ASSETS"
+    },
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "hh-responses-prod",
+            "database_id": "efcc99f0-ae78-4330-88cf-0fc333fc19ba"
+        }
+    ]
+}

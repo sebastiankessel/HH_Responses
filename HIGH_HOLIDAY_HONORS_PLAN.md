@@ -340,8 +340,8 @@ Example subject:
 5. DONE - Build CSV upload, parsing, validation, and import preview.
 6. DONE - Build assignment import and deduplication.
 7. DONE - Build member RSVP token pages and response persistence.
-8. Add transactional email integration and send tracking.
-9. Add manual admin create/edit flows for all setup data and assignments.
+8. DONE - Add transactional email integration and send tracking.
+9. DONE - Add manual admin create/edit flows for all setup data and assignments.
 10. Build admin response dashboard and CSV exports.
 11. Polish visual design, mobile responsiveness, and empty/error states.
 12. Run local build validation.

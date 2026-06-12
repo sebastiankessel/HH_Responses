@@ -1,8 +1,5 @@
 import { cookies } from "next/headers";
-import {
-  ADMIN_SESSION_COOKIE,
-  isValidAdminSessionToken,
-} from "@/lib/adminAuth";
+import { hasValidAdminSession } from "@/lib/adminAuth";
 
 export default async function AdminLayout({
   children,
@@ -10,9 +7,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const isAuthorized = await isValidAdminSessionToken(
-    cookieStore.get(ADMIN_SESSION_COOKIE)?.value
-  );
+  const isAuthorized = await hasValidAdminSession(cookieStore);
 
   if (!isAuthorized) {
     return <AdminLogin />;

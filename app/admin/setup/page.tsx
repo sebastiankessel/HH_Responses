@@ -8,10 +8,7 @@ import {
   listHonorsForYear,
   listServicesForYear,
 } from "@/db/helpers";
-import {
-  ADMIN_SESSION_COOKIE,
-  isValidAdminSessionToken,
-} from "@/lib/adminAuth";
+import { hasValidAdminSession } from "@/lib/adminAuth";
 import {
   createHonor,
   createService,
@@ -532,9 +529,7 @@ export default async function SetupPage({
 }) {
   const params = await searchParams;
   const cookieStore = await cookies();
-  const isAuthorized = await isValidAdminSessionToken(
-    cookieStore.get(ADMIN_SESSION_COOKIE)?.value
-  );
+  const isAuthorized = await hasValidAdminSession(cookieStore);
 
   if (!isAuthorized) {
     return null;
@@ -636,12 +631,12 @@ export default async function SetupPage({
     <main className="mx-auto max-w-7xl px-5 py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Link
+          <a
             className="text-sm font-semibold text-[#1d6f61] hover:text-[#185b50]"
             href="/admin"
           >
             Back to admin
-          </Link>
+          </a>
           <h2 className="mt-2 text-2xl font-semibold text-[#1d3c34]">
             Year and setup
           </h2>

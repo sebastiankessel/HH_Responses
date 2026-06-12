@@ -9,6 +9,10 @@ type RuntimeEnv = typeof env & {
   ADMIN_PASSWORD?: string;
 };
 
+type AdminCookieStore = {
+  getAll(name: string): Array<{ value: string }>;
+};
+
 export function getAdminPassword() {
   return (
     (env as RuntimeEnv).ADMIN_PASSWORD ??
@@ -33,6 +37,18 @@ export async function isValidAdminSessionToken(token: string | undefined) {
 
   const expected = await createAdminSessionToken();
   return timingSafeEqual(token, expected);
+}
+
+export async function hasValidAdminSession(cookieStore: AdminCookieStore) {
+  const tokens = cookieStore.getAll(ADMIN_SESSION_COOKIE);
+
+  for (const token of tokens) {
+    if (await isValidAdminSessionToken(token.value)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 async function signSessionPayload(secret: string) {

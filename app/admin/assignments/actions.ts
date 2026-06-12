@@ -13,11 +13,8 @@ import {
   upsertAssignment,
   upsertMember,
 } from "@/db/helpers";
-import { honors, services } from "@/db/schema";
-import {
-  ADMIN_SESSION_COOKIE,
-  isValidAdminSessionToken,
-} from "@/lib/adminAuth";
+import { assignments, honors, members, services } from "@/db/schema";
+import { hasValidAdminSession } from "@/lib/adminAuth";
 
 type AssignmentImportRow = {
   memberName: string;
@@ -53,11 +50,23 @@ function requiredNumber(formData: FormData, name: string) {
   return parsed;
 }
 
+function requiredText(formData: FormData, name: string) {
+  const value = formData.get(name);
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error(`${name} is required.`);
+  }
+
+  return value.trim();
+}
+
+function optionalText(formData: FormData, name: string) {
+  const value = formData.get(name);
+  return typeof value === "string" ? normalizeOptionalText(value) : null;
+}
+
 async function requireAdmin() {
   const cookieStore = await cookies();
-  const isAuthorized = await isValidAdminSessionToken(
-    cookieStore.get(ADMIN_SESSION_COOKIE)?.value
-  );
+  const isAuthorized = await hasValidAdminSession(cookieStore);
 
   if (!isAuthorized) {
     throw new Error("Admin access is required.");
@@ -197,6 +206,106 @@ function redirectWithCounts(yearId: number, counts: ImportCounts) {
   }
 
   redirect(`/admin/assignments?${params.toString()}`);
+}
+
+function redirectToAssignments(yearId: number) {
+  redirect(`/admin/assignments?yearId=${yearId}`);
+}
+
+async function requireHonorForYear(yearId: number, honorId: number) {
+  const db = getDb();
+  const [honor] = await db
+    .select({ id: honors.id })
+    .from(honors)
+    .where(and(eq(honors.id, honorId), eq(honors.yearId, yearId)))
+    .limit(1);
+
+  if (!honor) {
+    throw new Error("Selected honor does not belong to this year.");
+  }
+}
+
+function normalizedMemberValues(formData: FormData) {
+  const email = normalizeEmail(optionalText(formData, "email"));
+
+  if (!isValidEmail(email)) {
+    throw new Error("Enter a valid email address or leave email blank.");
+  }
+
+  return {
+    name: requiredText(formData, "memberName"),
+    email,
+    phone: optionalText(formData, "phone"),
+    externalMemberId: optionalText(formData, "externalMemberId"),
+  };
+}
+
+export async function createManualAssignment(formData: FormData) {
+  await requireAdmin();
+
+  const db = getDb();
+  const yearId = requiredNumber(formData, "yearId");
+  const honorId = requiredNumber(formData, "honorId");
+
+  await requireHonorForYear(yearId, honorId);
+  const member = await upsertMember(db, normalizedMemberValues(formData));
+  await upsertAssignment(db, {
+    yearId,
+    honorId,
+    memberId: member.id,
+    emailStatus: "not_sent",
+    responseStatus: "pending",
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/assignments");
+  revalidatePath("/admin/email");
+  redirectToAssignments(yearId);
+}
+
+export async function updateManualAssignment(formData: FormData) {
+  await requireAdmin();
+
+  const db = getDb();
+  const yearId = requiredNumber(formData, "yearId");
+  const assignmentId = requiredNumber(formData, "assignmentId");
+  const honorId = requiredNumber(formData, "honorId");
+  const memberValues = normalizedMemberValues(formData);
+
+  await requireHonorForYear(yearId, honorId);
+  const [assignment] = await db
+    .select({
+      id: assignments.id,
+      memberId: assignments.memberId,
+    })
+    .from(assignments)
+    .where(and(eq(assignments.id, assignmentId), eq(assignments.yearId, yearId)))
+    .limit(1);
+
+  if (!assignment) {
+    throw new Error("Assignment was not found.");
+  }
+
+  await db
+    .update(members)
+    .set({
+      ...memberValues,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(members.id, assignment.memberId));
+
+  await db
+    .update(assignments)
+    .set({
+      honorId,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(assignments.id, assignment.id));
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/assignments");
+  revalidatePath("/admin/email");
+  redirectToAssignments(yearId);
 }
 
 export async function importAssignments(formData: FormData) {

@@ -322,7 +322,9 @@ export async function listAssignmentsForYear(db: AppDb, yearId: number) {
       yearId: assignments.yearId,
       honorId: assignments.honorId,
       memberId: assignments.memberId,
+      rsvpToken: assignments.rsvpToken,
       emailStatus: assignments.emailStatus,
+      emailSentAt: assignments.emailSentAt,
       responseStatus: assignments.responseStatus,
       createdAt: assignments.createdAt,
       memberName: members.name,
@@ -347,6 +349,41 @@ export async function listAssignmentsForYear(db: AppDb, yearId: number) {
       asc(honors.honorType),
       asc(members.name)
     );
+}
+
+export async function getInvitationAssignmentById(
+  db: AppDb,
+  assignmentId: number
+) {
+  const [assignment] = await db
+    .select({
+      id: assignments.id,
+      yearId: assignments.yearId,
+      rsvpToken: assignments.rsvpToken,
+      emailStatus: assignments.emailStatus,
+      emailSentAt: assignments.emailSentAt,
+      responseStatus: assignments.responseStatus,
+      yearLabel: highHolidayYears.label,
+      jewishYear: highHolidayYears.jewishYear,
+      memberName: members.name,
+      memberEmail: members.email,
+      serviceName: services.name,
+      serviceDate: services.serviceDate,
+      serviceTime: services.serviceTime,
+      honorType: honors.honorType,
+      prayerName: honors.prayerName,
+      pageNumber: honors.pageNumber,
+      estimatedHonorTime: honors.estimatedHonorTime,
+    })
+    .from(assignments)
+    .innerJoin(highHolidayYears, eq(assignments.yearId, highHolidayYears.id))
+    .innerJoin(members, eq(assignments.memberId, members.id))
+    .innerJoin(honors, eq(assignments.honorId, honors.id))
+    .innerJoin(services, eq(honors.serviceId, services.id))
+    .where(eq(assignments.id, assignmentId))
+    .limit(1);
+
+  return assignment ?? null;
 }
 
 export async function findAssignmentByToken(db: AppDb, token: string) {
@@ -431,6 +468,25 @@ export async function listRsvpServiceOptionsForYear(db: AppDb, yearId: number) {
 export async function recordEmailEvent(db: AppDb, values: NewEmailEvent) {
   const [event] = await db.insert(emailEvents).values(values).returning();
   return event;
+}
+
+export async function markAssignmentEmailResult(
+  db: AppDb,
+  assignmentId: number,
+  status: "sent" | "failed",
+  sentAt: string | null
+) {
+  const [assignment] = await db
+    .update(assignments)
+    .set({
+      emailStatus: status,
+      emailSentAt: sentAt,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(assignments.id, assignmentId))
+    .returning();
+
+  return assignment ?? null;
 }
 
 export async function recordRsvpResponse(

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 const adminSections = [
   {
     title: "Year and setup",
@@ -8,15 +10,16 @@ const adminSections = [
     href: "/admin/setup",
   },
   {
-    title: "Assignment imports",
-    description: "Upload assigned members and preview corrections.",
+    title: "Assignments",
+    description: "Upload assigned members or manage assignments manually.",
     status: "Ready",
     href: "/admin/assignments",
   },
   {
     title: "Email invitations",
     description: "Send one invitation per honor assignment.",
-    status: "Planned",
+    status: "Ready",
+    href: "/admin/email",
   },
   {
     title: "Response review",

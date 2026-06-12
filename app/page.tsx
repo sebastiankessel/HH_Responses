@@ -6,10 +6,14 @@ export default function Home() {
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col justify-between px-5 py-8">
         <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            className="text-sm font-semibold uppercase text-[#1d3c34] sm:tracking-[0.18em]"
+            className="inline-flex items-center gap-3"
             href="/"
           >
-            Congregation Ner Tamid
+            <img
+              alt="Congregation Ner Tamid of South Bay"
+              className="h-14 w-auto"
+              src="/ner-tamid-logo.png"
+            />
           </Link>
           <Link
             className="rounded-md border border-[#b99b6d] px-4 py-2 text-sm font-semibold text-[#6b4a22] transition hover:bg-[#f2e5d0]"

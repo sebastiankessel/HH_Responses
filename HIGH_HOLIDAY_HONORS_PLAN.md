@@ -343,7 +343,7 @@ Example subject:
 8. DONE - Add transactional email integration and send tracking.
 9. DONE - Add manual admin create/edit flows for all setup data and assignments.
 10. DONE - Build admin response dashboard and CSV exports.
-11. Polish visual design, mobile responsiveness, and empty/error states.
+11. DONE - Polish visual design, mobile responsiveness, and empty/error states.
 12. Run local build validation.
 13. Deploy with Sites when ready.
 

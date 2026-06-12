@@ -16,3 +16,46 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+button {
+  min-height: 2.5rem;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+table {
+  min-width: 760px;
+}
+
+th,
+td {
+  vertical-align: top;
+}

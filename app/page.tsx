@@ -4,9 +4,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f8f3ea] text-[#231f20]">
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col justify-between px-5 py-8">
-        <nav className="flex items-center justify-between gap-4">
+        <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            className="text-sm font-semibold uppercase tracking-[0.18em] text-[#1d3c34]"
+            className="text-sm font-semibold uppercase text-[#1d3c34] sm:tracking-[0.18em]"
             href="/"
           >
             Congregation Ner Tamid
@@ -41,7 +41,7 @@ export default function Home() {
                 Open admin
               </Link>
               <span className="rounded-md border border-[#dfd1bd] px-5 py-3 text-center text-sm font-semibold text-[#6d635b]">
-                RSVP links are sent by email
+                Each honor has a unique RSVP link
               </span>
             </div>
           </div>
@@ -55,15 +55,16 @@ export default function Home() {
             </h2>
             <p className="mt-4 text-sm leading-7 text-[#625950]">
               Members receive a unique link for each assigned honor. The public
-              RSVP page will show the honor, service date, and response options
-              once invitation workflows are implemented.
+              RSVP page shows the honor, service date, and response options in
+              a focused mobile-friendly flow.
             </p>
             <div className="mt-6 border-t border-[#eadcca] pt-5">
               <p className="text-sm font-semibold text-[#3c352f]">
                 Office workspace
               </p>
               <p className="mt-2 text-sm leading-6 text-[#625950]">
-                Admin screens are protected by a server-side password gate.
+                Admin screens cover setup, assignments, invitations, response
+                review, and CSV exports behind a server-side password gate.
               </p>
             </div>
           </div>

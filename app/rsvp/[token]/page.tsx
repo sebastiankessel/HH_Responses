@@ -49,14 +49,14 @@ function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-[#f8f3ea] px-5 py-8 text-[#231f20]">
       <div className="mx-auto max-w-4xl">
-        <nav className="mb-8 flex items-center justify-between gap-4">
+        <nav className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            className="text-sm font-semibold uppercase tracking-[0.18em] text-[#1d3c34]"
+            className="text-sm font-semibold uppercase text-[#1d3c34] sm:tracking-[0.18em]"
             href="/"
           >
             Congregation Ner Tamid
           </Link>
-          <span className="text-right text-xs font-semibold uppercase tracking-[0.16em] text-[#8b5f2f]">
+          <span className="text-xs font-semibold uppercase text-[#8b5f2f] sm:text-right sm:tracking-[0.16em]">
             Jewish Spirit - Modern Experience
           </span>
         </nav>
@@ -73,13 +73,19 @@ function InvalidToken() {
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#8b5f2f]">
           RSVP link
         </p>
-        <h1 className="mt-4 text-3xl font-semibold text-[#1d3c34]">
+        <h1 className="mt-4 text-2xl font-semibold leading-tight text-[#1d3c34] sm:text-3xl">
           We could not find this honor invitation.
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-[#625950]">
           This link may be incomplete or no longer active. Please contact
-          Sebastian Kessel at ritualvp@nertamid.com and he can help confirm
-          your High Holiday honor assignment.
+          Sebastian Kessel at{" "}
+          <a
+            className="font-semibold text-[#1d6f61] underline-offset-4 hover:underline"
+            href="mailto:ritualvp@nertamid.com"
+          >
+            ritualvp@nertamid.com
+          </a>{" "}
+          and he can help confirm your High Holiday honor assignment.
         </p>
       </section>
     </PageShell>
@@ -110,7 +116,7 @@ export default async function RsvpPage({ params }: { params: PageParams }) {
   return (
     <PageShell>
       <section className="rounded-lg border border-[#dfd1bd] bg-[#fffaf2] p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#8b5f2f]">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#8b5f2f] sm:tracking-[0.18em]">
           High Holiday honors RSVP
         </p>
         <h1 className="mt-4 text-3xl font-semibold leading-tight text-[#1d3c34] sm:text-4xl">
@@ -194,8 +200,14 @@ export default async function RsvpPage({ params }: { params: PageParams }) {
             </dl>
             <p className="mt-5 text-sm leading-6 text-[#625950]">
               Submitted RSVP responses cannot be edited from this link. Please
-              contact Sebastian Kessel at ritualvp@nertamid.com if something
-              changes.
+              contact Sebastian Kessel at{" "}
+              <a
+                className="font-semibold text-[#1d6f61] underline-offset-4 hover:underline"
+                href="mailto:ritualvp@nertamid.com"
+              >
+                ritualvp@nertamid.com
+              </a>{" "}
+              if something changes.
             </p>
           </div>
         ) : (

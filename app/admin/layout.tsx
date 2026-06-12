@@ -17,13 +17,20 @@ export default async function AdminLayout({
     <main className="min-h-screen bg-[#f8f3ea] text-[#231f20]">
       <header className="border-b border-[#dfd1bd] bg-[#fffaf2]">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b5f2f]">
-              Congregation Ner Tamid of South Bay
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold text-[#1d3c34]">
-              High Holiday Honors Admin
-            </h1>
+          <div className="flex items-center gap-4">
+            <img
+              alt="Congregation Ner Tamid of South Bay"
+              className="h-14 w-auto"
+              src="/ner-tamid-logo.png"
+            />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8b5f2f]">
+                Congregation Ner Tamid of South Bay
+              </p>
+              <h1 className="mt-2 text-2xl font-semibold text-[#1d3c34]">
+                High Holiday Honors Admin
+              </h1>
+            </div>
           </div>
           <form action="/admin/logout" method="post">
             <button
